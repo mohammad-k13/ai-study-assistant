@@ -12,7 +12,7 @@ export type StoreState = {
 export type StoreActions = {
     setFiles: (files: FileData[]) => void;
     setSelectedFiles: (selectedFile: FileData[]) => void;
-    setMessages: (messages: ApiChatMessage[]) => void;
+    setMessages: (messages: ApiChatMessage[] | any) => void;
     setOnPromptFunction: (onPrompt: (prompt: string) => Promise<void>) => void;
 };
 

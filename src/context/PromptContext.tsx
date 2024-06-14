@@ -6,6 +6,7 @@ export type ContextType = {
     files: FileData[];
     selectedFile: FileData[];
     messages: ApiChatMessage[];
+    setMessages: any;
     onPrompt: (prompt: string) => void;
 };
 
@@ -14,6 +15,7 @@ export const PromptContext = createContext<ContextType>({
     files: [],
     messages: [],
     selectedFile: [],
+    setMessages: null,
     onPrompt: () => null,
 });
 

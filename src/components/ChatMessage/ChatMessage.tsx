@@ -2,11 +2,11 @@ import { Avatar, Button } from "@nextui-org/react";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { Edit } from "iconsax-react";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useContext, useState } from "react";
 
 //Local
+import { PromptContext } from "@/context/PromptContext";
 import { chatApi } from "@/services/api";
-import { useGlobalStore } from "@/store";
 import { useAnimatedText } from "../AnimatedText";
 
 export type ChatMessageProps = Omit<React.HTMLProps<HTMLDivElement>, "role"> & {
@@ -26,13 +26,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     const [isEditing, setIsEditing] = useState(false);
 
     //store Data
-    const { chatHistory, selectedFile, onPrompt, setChatHistory } =
-        useGlobalStore((state) => ({
-            selectedFile: state.selectedFile,
-            chatHistory: state.messages,
-            onPrompt: state.onPrompt,
-            setChatHistory: state.setMessages,
-        }));
+    const { messages, onPrompt, selectedFile, setMessages } =
+        useContext(PromptContext);
 
     const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -46,21 +41,17 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         setContent(response.message.message);
 
         // Call onPrompt with the new command
-        onPrompt(newCommand);
-
-        // Find the index of the object with the matching message
-        const targetIndex = chatHistory.findIndex(
-            (obj) => obj.message === message,
+        // onPrompt(newCommand);
+        const targetIndex = messages.findIndex(
+            (Item) => Item.message === message,
         );
-
-        if (targetIndex !== -1) {
-            // Filter out all objects that come after the target object
-            let newChatHistory = chatHistory.filter(
-                (_, index) => index >= targetIndex,
-            );
-            console.log(newChatHistory);
-            setChatHistory(newChatHistory);
-        }
+        const newChatHisotry = messages.filter(
+            (_, index) => index <= targetIndex,
+        );
+        setMessages([
+            ...newChatHisotry,
+            { message: response.message.message, role: response.message.role },
+        ]);
 
         // Exit edit mode
         setIsEditing(false);

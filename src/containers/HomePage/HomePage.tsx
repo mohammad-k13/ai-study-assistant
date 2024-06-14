@@ -1,10 +1,10 @@
 import { ChatMessages } from "@/components/ChatMessages";
 import { MessageBar } from "@/components/MessageBar";
 import { Search } from "@/components/Search";
+import { PromptContextProvider } from "@/context/PromptContext";
 import { ChatLayout } from "@/layouts/ChatLayout/Chat.layout";
 import { useSearch } from "@/queries/useSearch";
 import { ApiChatMessage, chatApi } from "@/services/api";
-import { useGlobalStore } from "@/store";
 import { FileData } from "@/types/data.types";
 import { populateDirs } from "@/utils/populateDirs.util";
 import React, { useEffect, useMemo, useState } from "react";
@@ -62,13 +62,6 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
     const [messages, setMessages] = useState<ApiChatMessage[]>([]);
     const [generating, setGenerating] = useState(false);
-    const { setFiles, setMessagesStore, setOnPrompt, setSelectedFilesStore } =
-        useGlobalStore((state) => ({
-            setFiles: state.setFiles,
-            setOnPrompt: state.setOnPromptFunction,
-            setMessagesStore: state.setMessages,
-            setSelectedFilesStore: state.setSelectedFiles,
-        }));
 
     const search = useSearch(
         { query },
@@ -92,7 +85,7 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
     const onPrompt = async (prompt: string) => {
         setGenerating(true);
 
-        setMessages((value) => [
+        setMessages((value: any) => [
             ...value,
             {
                 role: "user",
@@ -107,62 +100,60 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
         });
 
         setGenerating(false);
-        setMessages((value) => [...value, message]);
+        setMessages((value: any) => [...value, message]);
         setPrompt("");
     };
-
-    useMemo(() => {
-        setOnPrompt(onPrompt);
-        setFiles(testFilesData); //todo: should replace with search.data
-        setSelectedFilesStore(testFilesData); //todo: testFilesData should replace with search.data with filter logic
-        setMessagesStore(messages);
-    }, [messages.length, selectedFiles.length, search.data]);
 
     useEffect(() => {
         setSelectedFiles([]);
     }, [search.data]);
-
-    // useEffect(() => {
-    //     //update store
-    //     setFiles(testFilesData) //todo: should replace with search.data
-    //     setSelectedFilesStore(testFilesData) //todo: testFilesData should replace with search.data with filter logic
-    //     setMessagesStore(messages)
-    // }, [messages.length, selectedFiles.length, search.data])
 
     useEffect(() => {
         onSearch();
     }, []);
 
     return (
-        <ChatLayout
-            messageBar={
-                <MessageBar
-                    hide={selectedFiles.length === 0}
-                    prompt={prompt}
-                    onPromptChange={setPrompt}
-                    onSubmit={(prompt) => onPrompt(prompt)}
-                    loading={generating}
-                    disabled={generating}
-                />
-            }
+        <PromptContextProvider
+            payload={{
+                files: testFilesData,
+                setMessages: setMessages,
+                onPrompt: onPrompt,
+                messages: messages,
+                selectedFile: testFilesData.filter((f) =>
+                    selectedFiles.includes(f.id),
+                ),
+            }}
         >
-            <Search
-                compact={messages.length > 0}
-                searching={search.isFetching}
-                query={query}
-                onQueryChange={(v) => setQuery(v)}
-                onSearch={onSearch}
-                results={testFilesData}
-                onSelect={(selected) => setSelectedFiles(selected)}
-                selectedFiles={selectedFiles}
-            />
-            <ChatMessages
-                className="py-[20px]"
-                data={messages.map((msg) => ({
-                    role: msg.role,
-                    message: msg.message,
-                }))}
-            />
-        </ChatLayout>
+            <ChatLayout
+                messageBar={
+                    <MessageBar
+                        hide={selectedFiles.length === 0}
+                        prompt={prompt}
+                        onPromptChange={setPrompt}
+                        onSubmit={(prompt) => onPrompt(prompt)}
+                        loading={generating}
+                        disabled={generating}
+                    />
+                }
+            >
+                <Search
+                    compact={messages.length > 0}
+                    searching={search.isFetching}
+                    query={query}
+                    onQueryChange={(v) => setQuery(v)}
+                    onSearch={onSearch}
+                    results={testFilesData}
+                    onSelect={(selected) => setSelectedFiles(selected)}
+                    selectedFiles={selectedFiles}
+                />
+                <ChatMessages
+                    className="py-[20px]"
+                    data={messages.map((msg) => ({
+                        role: msg.role,
+                        message: msg.message,
+                    }))}
+                />
+            </ChatLayout>
+        </PromptContextProvider>
     );
 };
