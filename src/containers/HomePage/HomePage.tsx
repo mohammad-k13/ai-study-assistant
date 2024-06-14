@@ -111,7 +111,12 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
         setPrompt("");
     };
 
-    setOnPrompt(onPrompt);
+    useMemo(() => {
+        setOnPrompt(onPrompt);
+        setFiles(testFilesData); //todo: should replace with search.data
+        setSelectedFilesStore(testFilesData); //todo: testFilesData should replace with search.data with filter logic
+        setMessagesStore(messages);
+    }, [messages.length, selectedFiles.length, search.data]);
 
     useEffect(() => {
         setSelectedFiles([]);

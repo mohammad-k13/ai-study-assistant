@@ -31,8 +31,6 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
         }, 1000);
     }, [data]);
 
-    console.log(data);
-
     return (
         <div
             {...props}

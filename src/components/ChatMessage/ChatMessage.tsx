@@ -26,11 +26,13 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     const [isEditing, setIsEditing] = useState(false);
 
     //store Data
-    const { chatHistory, selectedFile, onPrompt } = useGlobalStore((state) => ({
-        selectedFile: state.selectedFile,
-        chatHistory: state.messages,
-        onPrompt: state.onPrompt,
-    }));
+    const { chatHistory, selectedFile, onPrompt, setChatHistory } =
+        useGlobalStore((state) => ({
+            selectedFile: state.selectedFile,
+            chatHistory: state.messages,
+            onPrompt: state.onPrompt,
+            setChatHistory: state.setMessages,
+        }));
 
     const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -47,15 +49,18 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         onPrompt(newCommand);
 
         // Find the index of the object with the matching message
-        // const targetIndex = chatHistory.findIndex(
-        //     (obj) => obj.message === message,
-        // );
+        const targetIndex = chatHistory.findIndex(
+            (obj) => obj.message === message,
+        );
 
-        // if (targetIndex !== -1) {
-        //     // Filter out all objects that come after the target object
-        //     chatHistory.filter((_, index) => index >= targetIndex);
-        // }
-        console.log(chatHistory);
+        if (targetIndex !== -1) {
+            // Filter out all objects that come after the target object
+            let newChatHistory = chatHistory.filter(
+                (_, index) => index >= targetIndex,
+            );
+            console.log(newChatHistory);
+            setChatHistory(newChatHistory);
+        }
 
         // Exit edit mode
         setIsEditing(false);

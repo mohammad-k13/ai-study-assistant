@@ -106,6 +106,7 @@ export const Search: React.FC<SearchProps> = ({
                 <section className="w-full flex items-center justify-center gap-5 my-3">
                     {filterList.map((item, index) => (
                         <Button
+                            key={index}
                             onClick={() => {
                                 onFilter(item.type);
                                 setCurrentfilter((pv) =>
