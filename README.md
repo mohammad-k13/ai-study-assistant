@@ -42,6 +42,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 ## Changes
 
 1.create a group of filters to enhance search result
+
 2.create context to share data from HomePage across children components
+
 3.user can edit his message and start a new chat from there.
+
 4.improve animations of chatting.
