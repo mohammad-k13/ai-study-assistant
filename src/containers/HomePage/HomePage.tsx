@@ -5,56 +5,10 @@ import { PromptContextProvider } from "@/context/PromptContext";
 import { ChatLayout } from "@/layouts/ChatLayout/Chat.layout";
 import { useSearch } from "@/queries/useSearch";
 import { ApiChatMessage, chatApi } from "@/services/api";
-import { FileData } from "@/types/data.types";
 import { populateDirs } from "@/utils/populateDirs.util";
 import React, { useEffect, useMemo, useState } from "react";
 
 export type HomePageProps = React.HTMLProps<HTMLDivElement>;
-
-const testFilesData: FileData[] = [
-    {
-        id: "1",
-        name: "Document 1",
-        type: "document",
-        excerpt: "Lorem ipsum dolor sit amet",
-        tags: ["tag1", "tag2"],
-        path: ["documents", "file1"],
-        extension: "pdf",
-
-        metadata: {
-            id: "metadata1",
-            __typename: "metadata",
-        },
-    },
-    {
-        id: "2",
-        name: "Image 1",
-        type: "image",
-        excerpt: "Consectetur adipiscing elit",
-        tags: ["tag3", "tag4"],
-        path: ["images", "file2"],
-        extension: "png",
-
-        metadata: {
-            id: "metadata2",
-            __typename: "metadata",
-        },
-    },
-    {
-        id: "3",
-        name: "Video 1",
-        type: "video",
-        excerpt: "Sed do eiusmod tempor incididunt",
-        tags: ["tag5", "tag6"],
-        path: ["videos", "file3"],
-        extension: "mp4",
-
-        metadata: {
-            id: "metadata3",
-            __typename: "metadata",
-        },
-    },
-];
 
 export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
     const [query, setQuery] = useState("");
@@ -115,11 +69,11 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
     return (
         <PromptContextProvider
             payload={{
-                files: testFilesData,
+                files: fileList,
                 setMessages: setMessages,
                 onPrompt: onPrompt,
                 messages: messages,
-                selectedFile: testFilesData.filter((f) =>
+                selectedFile: fileList.filter((f) =>
                     selectedFiles.includes(f.id),
                 ),
             }}
@@ -142,7 +96,7 @@ export const HomePage: React.FC<HomePageProps> = ({ className, ...props }) => {
                     query={query}
                     onQueryChange={(v) => setQuery(v)}
                     onSearch={onSearch}
-                    results={testFilesData}
+                    results={fileList}
                     onSelect={(selected) => setSelectedFiles(selected)}
                     selectedFiles={selectedFiles}
                 />
